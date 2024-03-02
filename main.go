@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	filereader "example.com/json-parser/fileReader"
+	filereader "example.com/json-parser/file-reader"
 	"example.com/json-parser/lexer"
 )
 
