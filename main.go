@@ -1,21 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"bufio"
 	"os"
 
-	filereader "example.com/json-parser/file-reader"
 	"example.com/json-parser/lexer"
+	"example.com/json-parser/parser"
 )
 
 func main() {
-	fileName := "test.json"
-	inputJSON, err := filereader.ReadContent(fileName)
-
-	if err != nil {
-		fmt.Printf("Error reading the file\n%s\n", err)
-		os.Exit(1)
-	}
-
-	lexer.GetTokens(inputJSON)
+	scanner := bufio.NewScanner(os.Stdin)
+	tokens := lexer.GetTokens(scanner)
+	parser.ParseTokens(tokens)
 }
