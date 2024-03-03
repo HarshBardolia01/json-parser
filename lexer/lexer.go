@@ -1,5 +1,10 @@
 package lexer
 
+import (
+	"bufio"
+	"fmt"
+)
+
 type TokenType int
 type LexerState int
 
@@ -62,22 +67,36 @@ type Token struct {
 
 type Lexer struct {
 	state      LexerState
-	position   int
+	row        int
+	col        int
 	buf        []rune
 	readTokens []Token
 }
 
-func GetTokens(inputJSON string) []Token {
+func GetTokens(scanner *bufio.Scanner) []Token {
 	lexer := Lexer{
 		state:      READING_NORMAL,
-		position:   0,
+		row:        1,
+		col:        1,
 		buf:        make([]rune, 0),
 		readTokens: make([]Token, 0),
 	}
 
-	for _, ch := range inputJSON {
-		lexer.readRune(ch)
-		lexer.position++
+	for scanner.Scan() {
+		line := scanner.Text()
+		size := len(line)
+
+		for ind, ch := range line {
+			lexer.readRune(ch)
+			lexer.col++
+			if ind == size-1 && lexer.state == READING_STRING {
+				fmt.Println(STATE_NAMES[lexer.state])
+				fmt.Println(line)
+				lexer.unexpectedCharacter(ch)
+			}
+		}
+		lexer.row++
+		lexer.col = 1
 	}
 
 	lexer.readTokens = append(lexer.readTokens, Token{EOF, "EOF"})
