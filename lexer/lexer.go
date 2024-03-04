@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"bufio"
-	"fmt"
 )
 
 type TokenType int
@@ -71,9 +70,10 @@ type Lexer struct {
 	col        int
 	buf        []rune
 	readTokens []Token
+	isError    bool
 }
 
-func GetTokens(scanner *bufio.Scanner) []Token {
+func GetTokens(scanner *bufio.Scanner) ([]Token, bool) {
 	lexer := Lexer{
 		state:      READING_NORMAL,
 		row:        1,
@@ -87,13 +87,19 @@ func GetTokens(scanner *bufio.Scanner) []Token {
 		size := len(line)
 
 		for ind, ch := range line {
+			if lexer.isError {
+				return []Token{}, false
+			}
 			lexer.readRune(ch)
 			lexer.col++
 			if ind == size-1 && lexer.state == READING_STRING {
-				fmt.Println(STATE_NAMES[lexer.state])
-				fmt.Println(line)
 				lexer.unexpectedCharacter(ch)
+				// fmt.Println(STATE_NAMES[lexer.state])
+				// fmt.Println(line)
 			}
+		}
+		if lexer.isError {
+			return []Token{}, false
 		}
 		lexer.row++
 		lexer.col = 1
@@ -101,6 +107,8 @@ func GetTokens(scanner *bufio.Scanner) []Token {
 
 	lexer.readTokens = append(lexer.readTokens, Token{EOF, "EOF"})
 	// lexer.printTokens()
-
-	return lexer.readTokens
+	if lexer.isError {
+		return []Token{}, false
+	}
+	return lexer.readTokens, true
 }

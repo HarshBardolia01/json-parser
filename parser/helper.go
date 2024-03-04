@@ -1,13 +1,12 @@
 package parser
 
 import (
-	"fmt"
-
 	"example.com/json-parser/lexer"
 )
 
 func (par *Parser) unexpextedToken(token lexer.Token) {
-	panic(fmt.Sprintf("Parser Error: Unexpected token %s", lexer.TOKEN_TYPE_NAMES[token.Type]))
+	par.isEnd = true
+	// panic(fmt.Sprintf("Parser Error: Unexpected token %s", lexer.TOKEN_TYPE_NAMES[token.Type]))
 }
 
 func (par *Parser) getStackPeekElement() StackElement {

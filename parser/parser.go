@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"example.com/json-parser/lexer"
 )
 
@@ -47,12 +45,14 @@ type Parser struct {
 	stack    []StackElement
 	depth    int
 	position int
+	isValid  bool
+	isEnd    bool
 }
 
 func (par *Parser) parse() {
 	par.stack = append(par.stack, StackElement{JSON_ELEMENT, JSON})
 
-	for par.position < len(par.tokens) {
+	for par.position < len(par.tokens) && !par.isEnd {
 		curToken := par.tokens[par.position]
 
 		if par.depth > 20 {
@@ -61,10 +61,15 @@ func (par *Parser) parse() {
 
 		if len(par.stack) == 0 {
 			if curToken.Type == lexer.EOF {
+				par.isValid = true
 				return
 			} else {
 				par.unexpextedToken(curToken)
 			}
+		}
+
+		if par.isEnd {
+			break
 		}
 
 		curStackPeek := par.getStackPeekElement()
@@ -87,14 +92,15 @@ func (par *Parser) parse() {
 	par.unexpextedToken(lexer.Token{Type: lexer.EOF, Value: "EOF"})
 }
 
-func ParseTokens(tokens []lexer.Token) {
+func ParseTokens(tokens []lexer.Token) bool {
 	parser := Parser{
 		tokens:   tokens,
 		stack:    make([]StackElement, 0),
 		position: 0,
+		isValid:  false,
+		isEnd:    false,
 	}
 
 	parser.parse()
-
-	fmt.Printf("\nValid JSON\n")
+	return parser.isValid
 }

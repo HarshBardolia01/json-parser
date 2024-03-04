@@ -11,7 +11,8 @@ func (lex *Lexer) getStateName() string {
 }
 
 func (lex *Lexer) unexpectedCharacter(ch rune) {
-	panic(fmt.Sprintf("Lexer Error: Unexpected character '%c' at row %d and col %d in %s State.", ch, lex.row, lex.col, lex.getStateName()))
+	lex.isError = true
+	// panic(fmt.Sprintf("Lexer Error: Unexpected character '%c' at row %d and col %d in %s State.", ch, lex.row, lex.col, lex.getStateName()))
 }
 
 func (lex *Lexer) printTokens() {
