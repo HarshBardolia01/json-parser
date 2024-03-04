@@ -7,9 +7,9 @@ failed_tests=()
 
 echo "Running coding challenge tests..."
 for file in ./tests/**/*.json; do
-	cat $file | ./main > /dev/null 2>&1
+	output=$(cat $file | ./main)
 
-	if [ $? -eq 0 ]; then
+	if [[ "$output" == "Valid JSON!" ]]; then
 		if [[ $file == *"invalid"* ]]; then
 			SYMBOL="✗"
 			failed_tests+=($file)
@@ -30,9 +30,9 @@ done
 
 echo "Running official tests..."
 for file in ./test/*.json; do
-	cat $file | ./main > /dev/null 2>&1
+	output=$(cat $file | ./main)
 
-	if [ $? -eq 0 ]; then
+	if [[ "$output" == "Valid JSON!" ]]; then
 		if [[ $file == *"fail"* ]]; then
 			SYMBOL="✗"
 			failed_tests+=($file)
