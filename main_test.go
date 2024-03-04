@@ -2,50 +2,37 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"testing"
+	"unicode"
 )
 
 func TestDoParsing(t *testing.T) {
-	// fileNameFromArgs := flag.Arg(0)
-	// fmt.Println(fileNameFromArgs)
-
-	files, err := os.Open("./test")
+	fileName := flag.Arg(0)
+	curFile, err := os.Open(fileName)
 
 	if err != nil {
-		t.Errorf("Error opening Directory: %s", err)
+		t.Errorf("Error opening file: %s", err)
 	}
 
-	defer files.Close()
-	fileInfo, err := files.ReadDir(-1)
+	fmt.Printf("\nTesting %s: ", fileName)
 
-	if err != nil {
-		t.Errorf("Error reading Directory: %s", err)
+	scanner := bufio.NewScanner(curFile)
+	isValid := doParsing(scanner)
+
+	size := len(fileName)
+	temp := fileName[0 : size-5]
+
+	for len(temp) > 0 && unicode.IsDigit(rune(temp[len(temp)-1])) {
+		temp = temp[0 : len(temp)-1]
 	}
 
-	var failedTests []string
+	verdict := temp[len(temp)-4:]
+	shouldBeValid := (verdict == "pass")
 
-	for _, file := range fileInfo {
-		fileName := file.Name()
-		curFile, err := os.Open(fmt.Sprintf("./test/%s", fileName))
-
-		if err != nil {
-			t.Errorf("Error opening file: %s", err)
-		}
-		scanner := bufio.NewScanner(curFile)
-		isValid := doParsing(scanner)
-		shouldBeValid := (fileName[0] == 'p')
-
-		if isValid != shouldBeValid {
-			failedTests = append(failedTests, fileName)
-		}
-	}
-
-	if len(failedTests) > 0 {
-		fmt.Println("Following test cases were Failed")
-		for _, fileName := range failedTests {
-			fmt.Println(fileName)
-		}
+	if isValid != shouldBeValid {
+		t.Errorf("Test Failed: %s", fileName)
 	}
 }
