@@ -8,7 +8,7 @@ rm ./coverage-test/reports/counts/*
 rm ./coverage-test/reports/functional/*
 
 # compile
-go test ./... -cover -c -o coverage-test
+go test ./... -cover -covermode=count -c -o coverage-test
 
 echo "Running Tests..."
 
